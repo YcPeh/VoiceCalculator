@@ -1,6 +1,6 @@
 import "./App.css";
 
-// import "./styles.css"; // css version of styling
+import "./styles.css"; // css version of styling
 
 
 
@@ -20,10 +20,10 @@ function App() {
                     <div className="col-6 p-0">
                         <button type="button" className="btn btn-primary w-100 border-1 border-dark">AC</button>
                     </div>
-                    <div className="col p-0">
+                    <div className="col-3 p-0">
                         <button type="button" className="btn btn-primary w-100 border-1 border-dark">DEL</button>
                     </div>
-                    <div className="col p-0">
+                    <div className="col-3 p-0">
                         <button type="button" className="btn btn-primary w-100 border-1 border-dark">÷</button>
                     </div>
                 </div>
