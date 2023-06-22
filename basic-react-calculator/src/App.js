@@ -3,7 +3,7 @@ import "./styles.css"; // css version of styling
 
 function App() {
   return (
-    <div className="container text-center d-flex align-items-center justify-content-center" style={{ height: "100vh" }}>
+    <div className="container text-center">
       {/* <br /><br /><br />
         <br /><br /><br />
         <br /><br /><br /> */}
