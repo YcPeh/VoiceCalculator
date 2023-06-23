@@ -8,7 +8,7 @@ function App() {
     return (
         <div className="container-flex p-0 d-flex align-items-center justify-content-center text-center" style={{ height: "100vh" }}>
 
-            <div className="container-custom">
+            <div className="container">
 
                 <div className="row border border-2 border-bottom-0 border-danger">
                     <div className="col p-0 text-break testcol">Up space</div>
