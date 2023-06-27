@@ -8,35 +8,103 @@ import EqualsButton from "./EqualsButton";
 const initialDisplay = { currentOperandText: "Down spaceeee", previousOperandText: "Up Spaceeee", currentOperand: "", previousOperand: "", operation: "",resultOperand:""}
 
 function compute(states, operationIn) {
+    let resultOperand;
     states.currentOperand = states.currentOperandText;
     switch (states.operation) {
         case "÷":
-            states.resultOperand = parseFloat(states.previousOperand) / parseFloat(states.currentOperand)
-            break;
+            resultOperand = parseFloat(states.previousOperand) / parseFloat(states.currentOperand)
+            if (operationIn!=='') {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    operation: operationIn
+                }
+            }else {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    // operation: operationIn
+                }
+            }
+            // break;
         case "-":
-            states.resultOperand = parseFloat(states.previousOperand) - parseFloat(states.currentOperand)
-            break;
+            resultOperand = parseFloat(states.previousOperand) - parseFloat(states.currentOperand)
+            if (operationIn!=='') {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    operation: operationIn
+                }
+            }else {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    // operation: operationIn
+                }
+            }
+            // break;
         case "*":
-            states.resultOperand = parseFloat(states.previousOperand) * parseFloat(states.currentOperand)
-            break;
+            resultOperand = parseFloat(states.previousOperand) * parseFloat(states.currentOperand)
+            if (operationIn!=='') {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    operation: operationIn
+                }
+            }else {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    // operation: operationIn
+                }
+            }
+            // break;
         case "+":
-            states.resultOperand = parseFloat(states.previousOperand) + parseFloat(states.currentOperand)
-            break;
+            resultOperand = parseFloat(states.previousOperand) + parseFloat(states.currentOperand)
+            if (operationIn!=='') {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    operation: operationIn
+                }
+            }else {
+                return {
+                    ...states,
+                    currentOperandText: "",
+                    previousOperand: resultOperand,
+                    previousOperandText: `${resultOperand}${operationIn}`,
+                    // operation: operationIn
+                }
+            }
+            // break;
         default:
             break;
     }
-    // states.operation = operationIn;
     // console.log({...states});
-    if (operationIn!=='') {
-        states.operation = operationIn
-    }
-    return {
-        ...states,
-        currentOperandText: "",
-        previousOperand: states.resultOperand,
-        previousOperandText: `${states.resultOperand}${operationIn}`,
-        // operation: operationIn
-    }
+    // if (operationIn!=='') {
+    //     states.operation = operationIn
+    // }
+    // return {
+    //     ...states,
+    //     currentOperandText: "",
+    //     previousOperand: states.resultOperand,
+    //     previousOperandText: `${states.resultOperand}${operationIn}`,
+    //     // operation: operationIn
+    // }
 }
 
 function reducer(states, { action, digit }) {
@@ -57,7 +125,7 @@ function reducer(states, { action, digit }) {
             // console.log({...states});
             // states.operation = digit;
             if (states.currentOperandText !== '' && states.previousOperandText !== '') {
-                compute(states, digit);
+                return compute(states, digit);
                 // return states;
             // 
             } else if (states.currentOperandText !== '') {
@@ -72,10 +140,10 @@ function reducer(states, { action, digit }) {
                 };
             // 
             } else if (states.previousOperandText !== '') {
-                states.previousOperand = states.previousOperandText
+                // states.previousOperand = states.previousOperandText
                 return {
                     ...states,
-                    // previousOperand:states.previousOperandText,
+                    previousOperand:states.previousOperandText,
                     currentOperand: states.currentOperandText,
                     previousOperandText: `${states.previousOperand}${digit}`,
                     operation: digit
@@ -84,8 +152,8 @@ function reducer(states, { action, digit }) {
 
         case "compute":
             // console.log({...states});
-            states = compute(states,'');
-            return states;
+            return compute(states,'');
+            // return states;
             // break;
         case "delete-current":
             return {
