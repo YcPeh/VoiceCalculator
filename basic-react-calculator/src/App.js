@@ -5,94 +5,48 @@ import DigitButton from './DigitButton';
 import OperationButton from "./OperationButton";
 import EqualsButton from "./EqualsButton";
 
-const initialDisplay = { currentOperandText: "Down spaceeee", previousOperandText: "Up Spaceeee", currentOperand: "", previousOperand: "", operation: "",resultOperand:""}
+const initialDisplay = { currentOperandText: "Down spaceeee", previousOperandText: "Up Spaceeee", currentOperand: "", previousOperand: "", operation: ""}
 
 function compute(states, operationIn) {
     let resultOperand;
-    states.currentOperand = states.currentOperandText;
+    // states.currentOperand = states.currentOperandText;
+    if(states.currentOperandText === "") return states
+    let currentOperand = states.currentOperandText;
     switch (states.operation) {
         case "÷":
-            resultOperand = parseFloat(states.previousOperand) / parseFloat(states.currentOperand)
-            if (operationIn!=='') {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    operation: operationIn
-                }
-            }else {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    // operation: operationIn
-                }
-            }
-            // break;
-        case "-":
-            resultOperand = parseFloat(states.previousOperand) - parseFloat(states.currentOperand)
-            if (operationIn!=='') {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    operation: operationIn
-                }
-            }else {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    // operation: operationIn
-                }
-            }
-            // break;
-        case "*":
-            resultOperand = parseFloat(states.previousOperand) * parseFloat(states.currentOperand)
-            if (operationIn!=='') {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    operation: operationIn
-                }
-            }else {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    // operation: operationIn
-                }
-            }
-            // break;
-        case "+":
-            resultOperand = parseFloat(states.previousOperand) + parseFloat(states.currentOperand)
-            if (operationIn!=='') {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    operation: operationIn
-                }
-            }else {
-                return {
-                    ...states,
-                    currentOperandText: "",
-                    previousOperand: resultOperand,
-                    previousOperandText: `${resultOperand}${operationIn}`,
-                    // operation: operationIn
-                }
-            }
-            // break;
-        default:
+            resultOperand = parseFloat(states.previousOperand) / parseFloat(currentOperand)
             break;
+        case "-":
+            resultOperand = parseFloat(states.previousOperand) - parseFloat(currentOperand)
+            break;
+        case "*":
+            resultOperand = parseFloat(states.previousOperand) * parseFloat(currentOperand)
+            break;
+        case "+":
+            resultOperand = parseFloat(states.previousOperand) + parseFloat(currentOperand)
+            break;
+        default:
+            return states;
+    }
+
+    if (operationIn!=='') {
+        return {
+            ...states,
+            currentOperand:"",
+            currentOperandText: "",
+            previousOperand: resultOperand,
+            previousOperandText: `${resultOperand}${operationIn}`,
+            operation: operationIn
+        }
+    }else {
+        return {
+            ...states,
+            currentOperand:"",
+            currentOperandText: "",
+            previousOperand: resultOperand,
+            previousOperandText: `${resultOperand}${operationIn}`,
+            // operation: operationIn
+        }
     }
     // console.log({...states});
     // if (operationIn!=='') {
@@ -118,8 +72,11 @@ function reducer(states, { action, digit }) {
     
     switch (action) {
         case "change-digit":
+            const newCurrentOperandText = `${states.currentOperandText}${digit}`;
             return {
-                ...states, currentOperandText: `${states.currentOperandText}${digit}`
+                ...states, 
+                currentOperandText: newCurrentOperandText,
+                currentOperand: newCurrentOperandText,
             };
         case "operation":
             // console.log({...states});
@@ -128,27 +85,35 @@ function reducer(states, { action, digit }) {
                 return compute(states, digit);
                 // return states;
             // 
-            } else if (states.currentOperandText !== '') {
+            } else if (states.currentOperandText !== '' || states.previousOperandText !== '') {
                 // states.previousOperand = states.currentOperandText;
+                let previousOperandTemp
+                if(states.previousOperandText === ''){
+                    previousOperandTemp = states.currentOperand;
+                }else{
+                    previousOperandTemp = states.previousOperand;
+                }
                 return {
                     ...states,
-                    currentOperand: states.currentOperandText,
-                    previousOperandText: `${states.currentOperandText}${digit}`,
+                    currentOperand: "",
+                    previousOperandText: `${previousOperandTemp}${digit}`,
                     currentOperandText: '',
                     operation: digit,
-                    previousOperand: states.currentOperandText
-                };
-            // 
-            } else if (states.previousOperandText !== '') {
-                // states.previousOperand = states.previousOperandText
-                return {
-                    ...states,
-                    previousOperand:states.previousOperandText,
-                    currentOperand: states.currentOperandText,
-                    previousOperandText: `${states.previousOperand}${digit}`,
-                    operation: digit
+                    previousOperand: previousOperandTemp
                 };
             }
+            // 
+            // } else if (states.previousOperandText !== '') {
+            //     // states.previousOperand = states.previousOperandText
+            //     return {
+            //         ...states,
+            //         previousOperand:states.previousOperandText,
+            //         currentOperand: states.currentOperandText,
+            //         previousOperandText: `${states.previousOperand}${digit}`,
+            //         operation: digit
+            //     };
+            // }
+            break;
 
         case "compute":
             // console.log({...states});
@@ -164,7 +129,7 @@ function reducer(states, { action, digit }) {
                 ...states, currentOperandText: '', previousOperandText: ''
             };
         default:
-            break;
+            return states;
     }
 }
 
