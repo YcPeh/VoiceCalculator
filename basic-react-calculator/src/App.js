@@ -1,15 +1,16 @@
 import "./App.css";
-import "./styles.css"; 
+import "./styles.css";
 import { useReducer } from "react";
 import DigitButton from './DigitButton';
 import OperationButton from "./OperationButton";
 import EqualsButton from "./EqualsButton";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-const initialDisplay = { currentOperandText: "", previousOperandText: "", currentOperand: "", previousOperand: "", operation: "", allowNewInput:false}
+const initialDisplay = { currentOperandText: "", previousOperandText: "", currentOperand: "", previousOperand: "", operation: "", allowNewInput: false }
 
 function compute(states, operationIn) {
     let resultOperand;
-    if(states.currentOperandText === "") return states
+    if (states.currentOperandText === "") return states
     let currentOperand = states.currentOperandText;
     switch (states.operation) {
         case "÷":
@@ -28,20 +29,20 @@ function compute(states, operationIn) {
             return states;
     }
 
-    if (operationIn!=='') {
+    if (operationIn !== '') {
         return {
             ...states,
-            currentOperand:"",
+            currentOperand: "",
             currentOperandText: "",
             previousOperand: resultOperand,
             previousOperandText: `${resultOperand}${operationIn}`,
             operation: operationIn,
-            allowNewInput:false,
+            allowNewInput: false,
         }
-    }else {
+    } else {
         return {
             ...states,
-            currentOperand:"",
+            currentOperand: "",
             currentOperandText: "",
             previousOperand: resultOperand,
             previousOperandText: `${resultOperand}${operationIn}`,
@@ -51,29 +52,59 @@ function compute(states, operationIn) {
 
 }
 
+function computeVoiceInput(input, states){
+    let voiceOperand1 = parseFloat(input[1]);
+    let voiceOperand2 = parseFloat(input[3]);
+    let voiceOperation = input[2];
+    let resultOperand
+    switch (voiceOperation) {
+        case "÷":
+            resultOperand = voiceOperand1 / voiceOperand2
+            break;
+        case "-":
+            resultOperand = voiceOperand1 - voiceOperand2
+            break;
+        case "*":
+            resultOperand = voiceOperand1 * voiceOperand2
+            break;
+        case "+":
+            resultOperand = voiceOperand1 + voiceOperand2
+            break;
+        default:
+            return states;
+    }
+
+    return {
+        ...states,
+        // currentOperandText:resultOperand.toString(),
+        previousOperandText: `${voiceOperand1}${voiceOperation}${voiceOperand2}=${resultOperand}`,
+        allowNewInput: true,
+    }
+}
+
 function reducer(states, { action, digit }) {
     switch (action) {
         case "add-digit":
-            if (digit==="0" && states.currentOperand ==="0") return states
-            if (digit==="." && states.currentOperand.includes(".")) return states
+            if (digit === "0" && states.currentOperand === "0") return states
+            if (digit === "." && states.currentOperand.includes(".")) return states
             const newCurrentOperandText = `${states.currentOperandText}${digit}`;
-            if (states.allowNewInput === true){
-                return{
+            if (states.allowNewInput === true) {
+                return {
                     ...states,
-                    previousOperand:"",
+                    previousOperand: "",
                     previousOperandText: "",
                     currentOperandText: newCurrentOperandText,
                     currentOperand: newCurrentOperandText,
-                    allowNewInput:false,
+                    allowNewInput: false,
                 }
-            } else{
+            } else {
                 return {
-                    ...states, 
+                    ...states,
                     currentOperandText: newCurrentOperandText,
                     currentOperand: newCurrentOperandText,
                 };
             }
-            
+
         case "operation":
             if (states.currentOperandText === "" && states.previousOperandText === "") {
                 return states;
@@ -81,9 +112,9 @@ function reducer(states, { action, digit }) {
                 return compute(states, digit);
             } else if (states.currentOperandText !== '' || states.previousOperandText !== '') {
                 let previousOperandTemp
-                if(states.previousOperandText === ''){
+                if (states.previousOperandText === '') {
                     previousOperandTemp = states.currentOperand;
-                }else{
+                } else {
                     previousOperandTemp = states.previousOperand;
                 }
                 return {
@@ -93,13 +124,13 @@ function reducer(states, { action, digit }) {
                     currentOperandText: '',
                     operation: digit,
                     previousOperand: previousOperandTemp,
-                    allowNewInput:false,
+                    allowNewInput: false,
                 };
             }
             break;
 
         case "compute":
-            return compute(states,'');
+            return compute(states, '');
         case "delete-current":
             return {
                 ...states, currentOperandText: states.currentOperandText.slice(0, -1)
@@ -108,13 +139,28 @@ function reducer(states, { action, digit }) {
             return {
                 ...states, currentOperandText: '', previousOperandText: ''
             };
+        case "input-transcript":
+            // const regexOp1 = /-?\d+(?:\.\d+)?/;
+            // const matches = digit.match(regexOp1);
+            // window.alert('Your message goes here');
+            const regex = /(\d+(?:\.\d+)?)\s*([-+*/])\s*(\d+(?:\.\d+)?)/;
+            const matches = digit.match(regex);
+            if (matches) {
+                return computeVoiceInput(matches, states)
+            } else {
+                console.log("Voice can't be heard");
+                window.alert("Voice can't be heard")
+            }
         default:
             return states;
     }
 }
 
+
 function App() {
     const [states, dispatch] = useReducer(reducer, initialDisplay)
+
+    const { transcript, listening } = useSpeechRecognition();
     return (
         <div className="container-flex p-0 d-flex align-items-center justify-content-center text-center" style={{ height: "100vh" }}>
 
@@ -179,7 +225,7 @@ function App() {
                         <OperationButton dispatch={dispatch} operationButton="-"></OperationButton>
                     </div>
                 </div>
-                <div className="row border border-2 border-top-0 border-danger">
+                <div className="row border border-2 border-top-0 border-bottom-0 border-danger">
                     <div className="col-3 p-0">
                         <DigitButton digitButton="." dispatch={dispatch}></DigitButton>
                     </div>
@@ -190,8 +236,25 @@ function App() {
                         <EqualsButton dispatch={dispatch}></EqualsButton>
                     </div>
                 </div>
-
+                <div className="row border border-2 border-top-0 border-danger mic-row">
+                    <div className="col-6 p-0">
+                        <button type="button" className="btn btn-light w-100 border-1 border-dark">
+                            <img id="micImage" src="/mic start.png" alt="mic photo missing" onClick={SpeechRecognition.startListening} />
+                        </button>
+                    </div>
+                    <div className="col-6 p-0">
+                        <button type="button" className="btn btn-light w-100 border-1 border-dark">
+                            <img id="micImage2" src="/mic stop.png" alt="mic photo missing" onClick={() => {
+                                SpeechRecognition.stopListening();
+                                dispatch({action:"input-transcript", digit: transcript});
+                            }} />
+                        </button>
+                    </div>
+                </div>
+                <p>Microphone: {listening ? 'on' : 'off'}</p>
+                {transcript && <p>text: <br />{transcript}</p>}
             </div>
+
 
         </div>
 
