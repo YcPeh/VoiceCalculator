@@ -52,7 +52,7 @@ function compute(states, operationIn) {
 
 }
 
-function computeVoiceInput(input, states){
+function computeVoiceInput(input, states) {
     let voiceOperand1 = parseFloat(input[1]);
     let voiceOperand2 = parseFloat(input[3]);
     let voiceOperation = input[2];
@@ -149,7 +149,8 @@ function reducer(states, { action, digit }) {
                 return computeVoiceInput(matches, states)
             } else {
                 console.log("Voice can't be heard");
-                window.alert("Voice can't be heard")
+                window.alert("Voice can't be heard");
+                return states;
             }
         default:
             return states;
@@ -239,14 +240,14 @@ function App() {
                 <div className="row border border-2 border-top-0 border-danger mic-row">
                     <div className="col-6 p-0">
                         <button type="button" className="btn btn-light w-100 border-1 border-dark">
-                            <img id="micImage" src="/mic start.png" alt="mic photo missing" onClick={SpeechRecognition.startListening} />
+                            <img id="micImage" src="/mic start.png" onClick={SpeechRecognition.startListening} />
                         </button>
                     </div>
                     <div className="col-6 p-0">
                         <button type="button" className="btn btn-light w-100 border-1 border-dark">
-                            <img id="micImage2" src="/mic stop.png" alt="mic photo missing" onClick={() => {
+                            <img id="micImage2" src="/mic stop.png" onClick={() => {
                                 SpeechRecognition.stopListening();
-                                dispatch({action:"input-transcript", digit: transcript});
+                                dispatch({ action: "input-transcript", digit: transcript });
                             }} />
                         </button>
                     </div>
