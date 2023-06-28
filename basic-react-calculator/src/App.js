@@ -1,15 +1,14 @@
 import "./App.css";
-import "./styles.css"; // css version of styling
+import "./styles.css"; 
 import { useReducer } from "react";
 import DigitButton from './DigitButton';
 import OperationButton from "./OperationButton";
 import EqualsButton from "./EqualsButton";
 
-const initialDisplay = { currentOperandText: "Down spaceeee", previousOperandText: "Up Spaceeee", currentOperand: "", previousOperand: "", operation: ""}
+const initialDisplay = { currentOperandText: "", previousOperandText: "", currentOperand: "", previousOperand: "", operation: "", allowNewInput:false}
 
 function compute(states, operationIn) {
     let resultOperand;
-    // states.currentOperand = states.currentOperandText;
     if(states.currentOperandText === "") return states
     let currentOperand = states.currentOperandText;
     switch (states.operation) {
@@ -36,7 +35,8 @@ function compute(states, operationIn) {
             currentOperandText: "",
             previousOperand: resultOperand,
             previousOperandText: `${resultOperand}${operationIn}`,
-            operation: operationIn
+            operation: operationIn,
+            allowNewInput:false,
         }
     }else {
         return {
@@ -45,48 +45,41 @@ function compute(states, operationIn) {
             currentOperandText: "",
             previousOperand: resultOperand,
             previousOperandText: `${resultOperand}${operationIn}`,
-            // operation: operationIn
+            allowNewInput: true,
         }
     }
-    // console.log({...states});
-    // if (operationIn!=='') {
-    //     states.operation = operationIn
-    // }
-    // return {
-    //     ...states,
-    //     currentOperandText: "",
-    //     previousOperand: states.resultOperand,
-    //     previousOperandText: `${states.resultOperand}${operationIn}`,
-    //     // operation: operationIn
-    // }
+
 }
 
 function reducer(states, { action, digit }) {
-    // let previousOperand;
-    // if(states.previousOperandText === ""){
-    //     previousOperand = states.previousOperandText
-    // }else{
-
-    // }
-    // let currentOperand = states.currentOperandText;
-    
     switch (action) {
-        case "change-digit":
+        case "add-digit":
+            if (digit==="0" && states.currentOperand ==="0") return states
+            if (digit==="." && states.currentOperand.includes(".")) return states
             const newCurrentOperandText = `${states.currentOperandText}${digit}`;
-            return {
-                ...states, 
-                currentOperandText: newCurrentOperandText,
-                currentOperand: newCurrentOperandText,
-            };
+            if (states.allowNewInput === true){
+                return{
+                    ...states,
+                    previousOperand:"",
+                    previousOperandText: "",
+                    currentOperandText: newCurrentOperandText,
+                    currentOperand: newCurrentOperandText,
+                    allowNewInput:false,
+                }
+            } else{
+                return {
+                    ...states, 
+                    currentOperandText: newCurrentOperandText,
+                    currentOperand: newCurrentOperandText,
+                };
+            }
+            
         case "operation":
-            // console.log({...states});
-            // states.operation = digit;
-            if (states.currentOperandText !== '' && states.previousOperandText !== '') {
+            if (states.currentOperandText === "" && states.previousOperandText === "") {
+                return states;
+            } else if (states.currentOperandText !== '' && states.previousOperandText !== '') {
                 return compute(states, digit);
-                // return states;
-            // 
             } else if (states.currentOperandText !== '' || states.previousOperandText !== '') {
-                // states.previousOperand = states.currentOperandText;
                 let previousOperandTemp
                 if(states.previousOperandText === ''){
                     previousOperandTemp = states.currentOperand;
@@ -99,27 +92,14 @@ function reducer(states, { action, digit }) {
                     previousOperandText: `${previousOperandTemp}${digit}`,
                     currentOperandText: '',
                     operation: digit,
-                    previousOperand: previousOperandTemp
+                    previousOperand: previousOperandTemp,
+                    allowNewInput:false,
                 };
             }
-            // 
-            // } else if (states.previousOperandText !== '') {
-            //     // states.previousOperand = states.previousOperandText
-            //     return {
-            //         ...states,
-            //         previousOperand:states.previousOperandText,
-            //         currentOperand: states.currentOperandText,
-            //         previousOperandText: `${states.previousOperand}${digit}`,
-            //         operation: digit
-            //     };
-            // }
             break;
 
         case "compute":
-            // console.log({...states});
             return compute(states,'');
-            // return states;
-            // break;
         case "delete-current":
             return {
                 ...states, currentOperandText: states.currentOperandText.slice(0, -1)
