@@ -240,12 +240,12 @@ function App() {
                 <div className="row border border-2 border-top-0 border-danger mic-row">
                     <div className="col-6 p-0">
                         <button type="button" className="btn btn-light w-100 border-1 border-dark">
-                            <img id="micImage" src="/mic start.png" onClick={SpeechRecognition.startListening} />
+                            <img id="micImage" src="/mic start.png" alt="missing" onClick={SpeechRecognition.startListening} />
                         </button>
                     </div>
                     <div className="col-6 p-0">
                         <button type="button" className="btn btn-light w-100 border-1 border-dark">
-                            <img id="micImage2" src="/mic stop.png" onClick={() => {
+                            <img id="micImage2" src="/mic stop.png" alt="missing" onClick={() => {
                                 SpeechRecognition.stopListening();
                                 dispatch({ action: "input-transcript", digit: transcript });
                             }} />
