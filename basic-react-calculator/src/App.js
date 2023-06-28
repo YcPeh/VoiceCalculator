@@ -140,10 +140,10 @@ function App() {
 
             <div className="container">
 
-                <div className="row border border-2 border-bottom-0 border-danger">
+                <div className="row border border-2 border-bottom-0 border-danger text-white">
                     <div className="col p-0 text-break text-end d-flex align-items-center justify-content-end previous-operand">{states.previousOperandText}</div>
                 </div>
-                <div className="row border border-2 border-top-0 border-bottom-0 border-danger">
+                <div className="row border border-2 border-top-0 border-bottom-0 border-danger text-white">
                     <div className="col p-0 text-break text-end d-flex align-items-center justify-content-end current-operand">{states.currentOperandText}</div>
                 </div>
                 <div className="row border border-2 border-bottom-0 border-danger">
