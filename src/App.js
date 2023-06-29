@@ -52,34 +52,42 @@ function compute(states, operationIn) {
 
 }
 
-function computeVoiceInput(input, states) {
-    let voiceOperand1 = parseFloat(input[1]);
-    let voiceOperand2 = parseFloat(input[3]);
-    let voiceOperation = input[2];
-    let resultOperand
-    switch (voiceOperation) {
-        case "÷":
-            resultOperand = voiceOperand1 / voiceOperand2
-            break;
-        case "-":
-            resultOperand = voiceOperand1 - voiceOperand2
-            break;
-        case "*":
-            resultOperand = voiceOperand1 * voiceOperand2
-            break;
-        case "+":
-            resultOperand = voiceOperand1 + voiceOperand2
-            break;
-        default:
-            return states;
-    }
+function computeVoiceInput(matches, states) {
+    let resultOperand;
 
+    for (let i = 0; i < matches.length-1; i=i+2) {
+        const operation = matches[i+1];
+        let operand1;
+        if (i===0) {
+            operand1= parseFloat(matches[i]);
+        }else{
+            operand1=resultOperand;
+        }
+        const operand2= parseFloat(matches[i+2]);
+
+        switch (operation) {
+            case "+":
+                resultOperand = operand1 + operand2;
+                break;
+            case "-":
+                resultOperand = operand1 - operand2;
+                break;
+            case "x":
+                resultOperand = operand1 * operand2;
+                break;
+            case "/":
+                resultOperand = operand1 / operand2;
+                break;
+            default:
+                return states;
+        }
+    }
+    const spacedInput = matches.join(" ");
     return {
         ...states,
-        // currentOperandText:resultOperand.toString(),
-        previousOperandText: `${voiceOperand1}${voiceOperation}${voiceOperand2}=${resultOperand}`,
+        previousOperandText: `${spacedInput} = ${resultOperand}`,
         allowNewInput: true,
-    }
+    };
 }
 
 function reducer(states, { action, digit }) {
@@ -140,13 +148,10 @@ function reducer(states, { action, digit }) {
                 ...states, currentOperandText: '', previousOperandText: ''
             };
         case "input-transcript":
-            // const regexOp1 = /-?\d+(?:\.\d+)?/;
-            // const matches = digit.match(regexOp1);
-            // window.alert('Your message goes here');
-            const regex = /(\d+(?:\.\d+)?)\s*([-+*/])\s*(\d+(?:\.\d+)?)/;
-            const matches = digit.match(regex);
+            const regex = /\d+(\.\d+)?|[+\-x\/]/g;
+            const matches = [digit.match(regex)];
             if (matches) {
-                return computeVoiceInput(matches, states)
+                return computeVoiceInput(matches[0], states)
             } else {
                 console.log("Voice can't be heard");
                 window.alert("Voice can't be heard");
@@ -239,26 +244,23 @@ function App() {
                 </div>
                 <div className="row border border-2 border-top-0 border-danger mic-row">
                     <div className="col-6 p-0">
-                        <button type="button" className="btn btn-light w-100 border-1 border-dark">
-                            <img id="micImage" src="/mic start.png" alt="missing" onClick={SpeechRecognition.startListening} />
+                        <button type="button" className="btn btn-light w-100 border-1 border-dark" onClick={SpeechRecognition.startListening}>
+                            <img id="micImage" src="/mic start.png" alt="missing" />
                         </button>
                     </div>
                     <div className="col-6 p-0">
-                        <button type="button" className="btn btn-light w-100 border-1 border-dark">
-                            <img id="micImage2" src="/mic stop.png" alt="missing" onClick={() => {
-                                SpeechRecognition.stopListening();
-                                dispatch({ action: "input-transcript", digit: transcript });
-                            }} />
+                        <button type="button" className="btn btn-light w-100 border-1 border-dark" onClick={() => {
+                            SpeechRecognition.stopListening();
+                            dispatch({ action: "input-transcript", digit: transcript });
+                        }}>
+                            <img id="micImage2" src="/mic stop.png" alt="missing" />
                         </button>
                     </div>
                 </div>
                 <p>Microphone: {listening ? 'on' : 'off'}</p>
                 {transcript && <p>text: <br />{transcript}</p>}
             </div>
-
-
         </div>
-
     );
 }
 
