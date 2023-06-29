@@ -148,6 +148,7 @@ function reducer(states, { action, digit }) {
                 ...states, currentOperandText: '', previousOperandText: ''
             };
         case "input-transcript":
+            // eslint-disable-next-line
             const regex = /\d+(\.\d+)?|[+\-x\/]/g;
             const matches = [digit.match(regex)];
             if (matches) {
