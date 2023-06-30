@@ -1,6 +1,6 @@
 import "./App.css";
 import "./styles.css";
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import DigitButton from './DigitButton';
 import OperationButton from "./OperationButton";
 import EqualsButton from "./EqualsButton";
@@ -55,15 +55,15 @@ function compute(states, operationIn) {
 function computeVoiceInput(matches, states) {
     let resultOperand;
 
-    for (let i = 0; i < matches.length-1; i=i+2) {
-        const operation = matches[i+1];
+    for (let i = 0; i < matches.length - 1; i = i + 2) {
+        const operation = matches[i + 1];
         let operand1;
-        if (i===0) {
-            operand1= parseFloat(matches[i]);
-        }else{
-            operand1=resultOperand;
+        if (i === 0) {
+            operand1 = parseFloat(matches[i]);
+        } else {
+            operand1 = resultOperand;
         }
-        const operand2= parseFloat(matches[i+2]);
+        const operand2 = parseFloat(matches[i + 2]);
 
         switch (operation) {
             case "+":
@@ -151,7 +151,7 @@ function reducer(states, { action, digit }) {
             // eslint-disable-next-line
             const regex = /\d+(\.\d+)?|[+\-x\/]/g;
             const matches = [digit.match(regex)];
-            if (matches) {
+            if (matches[0] !== null) {
                 return computeVoiceInput(matches[0], states)
             } else {
                 console.log("Voice can't be heard");
@@ -166,8 +166,30 @@ function reducer(states, { action, digit }) {
 
 function App() {
     const [states, dispatch] = useReducer(reducer, initialDisplay)
+    const { transcript, resetTranscript, listening } = useSpeechRecognition();
+    const [lang, setLang] = useState('en')
+    const [langDisplay, setLangDisplay] = useState('eng')
 
-    const { transcript, listening } = useSpeechRecognition();
+    const toggleLanguage = () => {
+        switch (lang) {
+            case 'en':
+                setLang('th')
+                setLangDisplay('thai')
+                break;
+            case 'th':
+                setLang('zh-CN')
+                setLangDisplay('chinese')
+                break;
+            case 'zh-CN':
+                setLang('en')
+                setLangDisplay('eng')
+                break;
+
+            default:
+                break;
+        }
+    }
+
     return (
         <div className="container-flex p-0 d-flex align-items-center justify-content-center text-center" style={{ height: "100vh" }}>
 
@@ -245,7 +267,13 @@ function App() {
                 </div>
                 <div className="row border border-2 border-top-0 border-danger mic-row">
                     <div className="col-6 p-0">
-                        <button type="button" className="btn btn-light w-100 border-1 border-dark" onClick={SpeechRecognition.startListening}>
+                        <button type="button" className="btn btn-light w-100 border-1 border-dark" onClick={() => {
+                            resetTranscript();
+                            SpeechRecognition.startListening({
+                                language: lang,
+                                continuous: true
+                            });
+                        }}>
                             <img id="micImage" src="/mic start.png" alt="missing" />
                         </button>
                     </div>
@@ -258,6 +286,9 @@ function App() {
                         </button>
                     </div>
                 </div>
+                <br />
+                <button type="button" onClick={toggleLanguage}>{langDisplay}</button>
+                <br />
                 <p>Microphone: {listening ? 'on' : 'off'}</p>
                 {transcript && <p>text: <br />{transcript}</p>}
             </div>
